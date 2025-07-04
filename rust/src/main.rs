@@ -1,6 +1,6 @@
 mod api;
 
-use api::game::Game;
+use api::game::UTTTGame;
 use api::game::GridPosition;
 
 fn print_available(available: Vec<GridPosition>) {
@@ -15,7 +15,7 @@ fn print_available(available: Vec<GridPosition>) {
 }
  
 fn main() {
-    let mut game = Game::new();
+    let mut game = UTTTGame::new();
     let _ = game.play(GridPosition { grid: 1, pos_in_grid: 0 }, true);
     let _ = game.play(GridPosition { grid: 0, pos_in_grid: 4 }, false);
     let available = game.play(GridPosition { grid: 4, pos_in_grid: 0 }, false);

@@ -1,6 +1,6 @@
 use std::fmt::{self};
 
-pub struct Game {
+pub struct UTTTGame {
     // 1 bit per position on the board, thus only the first 81 bit are relevant
     // The first 9 bits correspond to the top left grid, the 9 next one to the middle top one and so on
 
@@ -35,7 +35,7 @@ pub struct GridPosition {
     pub pos_in_grid: u16,
 }
 
-impl Game {
+impl UTTTGame {
     pub fn new() -> Self {
         Self {
             crosses: 0,
@@ -129,7 +129,7 @@ impl Game {
     }
 }
 
-impl fmt::Display for Game {
+impl fmt::Display for UTTTGame {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "Game State: {}\n", self.state)?;
 

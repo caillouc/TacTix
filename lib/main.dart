@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tac_tics/src/rust/api/simple.dart';
+import 'package:tac_tics/src/rust/api/game.dart';
 import 'package:tac_tics/src/rust/frb_generated.dart';
 
 Future<void> main() async {
@@ -7,19 +7,17 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
+Widget grid = Row(children: [Column(children: [IconButton(onPressed: () {print("object")}, icon: icon)])]);
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var game = UTTTGame.newInstance();
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: const Text('flutter_rust_bridge quickstart')),
-        body: Center(
-          child: Text(
-            'Action: Call Rust `greet("Tom")`\nResult: `${greet(name: "Tom")}`',
-          ),
-        ),
+        body: Center(child: Row(children: [Col])),
       ),
     );
   }
