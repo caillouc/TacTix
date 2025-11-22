@@ -26,7 +26,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UtttGame
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    dynamic raw,
+  );
+
+  @protected
+  UtttGame
   dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    dynamic raw,
+  );
+
+  @protected
+  UtttGame
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
     dynamic raw,
   );
 
@@ -79,11 +91,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_usize(dynamic raw);
 
   @protected
-  UTTTGame dco_decode_uttt_game(dynamic raw);
+  UtttGame
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    SseDeserializer deserializer,
+  );
 
   @protected
   UtttGame
   sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    SseDeserializer deserializer,
+  );
+
+  @protected
+  UtttGame
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
     SseDeserializer deserializer,
   );
 
@@ -140,11 +161,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
-  UTTTGame sse_decode_uttt_game(SseDeserializer deserializer);
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    UtttGame self,
+    SseSerializer serializer,
+  );
 
   @protected
   void
   sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    UtttGame self,
+    SseSerializer serializer,
+  );
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
     UtttGame self,
     SseSerializer serializer,
   );
@@ -206,9 +238,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_uttt_game(UTTTGame self, SseSerializer serializer);
 }
 
 // Section: wire_class

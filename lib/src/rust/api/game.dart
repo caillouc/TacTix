@@ -7,10 +7,42 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `check_single_win`, `check_win`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<UTTTGame>>
-abstract class UtttGame implements RustOpaqueInterface {}
+abstract class UtttGame implements RustOpaqueInterface {
+  Future<GridPosition> aiPlay({
+    required List<GridPosition> availableMove,
+    required bool crossPlaying,
+  });
+
+  int get bigGame;
+
+  BigInt get crosses;
+
+  BigInt get noughts;
+
+  GameState get state;
+
+  set bigGame(int bigGame);
+
+  set crosses(BigInt crosses);
+
+  set noughts(BigInt noughts);
+
+  set state(GameState state);
+
+  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
+  static Future<UtttGame> newInstance() =>
+      RustLib.instance.api.crateApiGameUtttGameNew();
+
+  Future<List<GridPosition>> play({
+    required GridPosition cell,
+    required bool crossPlaying,
+  });
+
+  Future<void> undo({required GridPosition cell, required bool crossMove});
+}
 
 enum GameState { crosssesWin, noughtsWin, tie, crossesTurn, noughtsTurn }
 
@@ -30,45 +62,4 @@ class GridPosition {
           runtimeType == other.runtimeType &&
           grid == other.grid &&
           posInGrid == other.posInGrid;
-}
-
-class UTTTGame {
-  final BigInt crosses;
-  final BigInt noughts;
-  final int bigGame;
-  final GameState state;
-
-  const UTTTGame({
-    required this.crosses,
-    required this.noughts,
-    required this.bigGame,
-    required this.state,
-  });
-
-  // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
-  static Future<UTTTGame> newInstance() =>
-      RustLib.instance.api.crateApiGameUtttGameNew();
-
-  Future<List<GridPosition>> play({
-    required GridPosition cell,
-    required bool crossPlaying,
-  }) => RustLib.instance.api.crateApiGameUtttGamePlay(
-    that: this,
-    cell: cell,
-    crossPlaying: crossPlaying,
-  );
-
-  @override
-  int get hashCode =>
-      crosses.hashCode ^ noughts.hashCode ^ bigGame.hashCode ^ state.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is UTTTGame &&
-          runtimeType == other.runtimeType &&
-          crosses == other.crosses &&
-          noughts == other.noughts &&
-          bigGame == other.bigGame &&
-          state == other.state;
 }

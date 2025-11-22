@@ -62,7 +62,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.10.0';
 
   @override
-  int get rustContentHash => 1902694287;
+  int get rustContentHash => 1565766477;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -73,12 +73,52 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<UTTTGame> crateApiGameUtttGameNew();
+  Future<GridPosition> crateApiGameUtttGameAiPlay({
+    required UtttGame that,
+    required List<GridPosition> availableMove,
+    required bool crossPlaying,
+  });
+
+  int crateApiGameUtttGameAutoAccessorGetBigGame({required UtttGame that});
+
+  BigInt crateApiGameUtttGameAutoAccessorGetCrosses({required UtttGame that});
+
+  BigInt crateApiGameUtttGameAutoAccessorGetNoughts({required UtttGame that});
+
+  GameState crateApiGameUtttGameAutoAccessorGetState({required UtttGame that});
+
+  void crateApiGameUtttGameAutoAccessorSetBigGame({
+    required UtttGame that,
+    required int bigGame,
+  });
+
+  void crateApiGameUtttGameAutoAccessorSetCrosses({
+    required UtttGame that,
+    required BigInt crosses,
+  });
+
+  void crateApiGameUtttGameAutoAccessorSetNoughts({
+    required UtttGame that,
+    required BigInt noughts,
+  });
+
+  void crateApiGameUtttGameAutoAccessorSetState({
+    required UtttGame that,
+    required GameState state,
+  });
+
+  Future<UtttGame> crateApiGameUtttGameNew();
 
   Future<List<GridPosition>> crateApiGameUtttGamePlay({
     required UtttGame that,
     required GridPosition cell,
     required bool crossPlaying,
+  });
+
+  Future<void> crateApiGameUtttGameUndo({
+    required UtttGame that,
+    required GridPosition cell,
+    required bool crossMove,
   });
 
   RustArcIncrementStrongCountFnType
@@ -99,11 +139,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<UTTTGame> crateApiGameUtttGameNew() {
+  Future<GridPosition> crateApiGameUtttGameAiPlay({
+    required UtttGame that,
+    required List<GridPosition> availableMove,
+    required bool crossPlaying,
+  }) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
           final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          sse_encode_list_grid_position(availableMove, serializer);
+          sse_encode_bool(crossPlaying, serializer);
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
@@ -112,7 +162,285 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
         },
         codec: SseCodec(
-          decodeSuccessData: sse_decode_uttt_game,
+          decodeSuccessData: sse_decode_grid_position,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAiPlayConstMeta,
+        argValues: [that, availableMove, crossPlaying],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAiPlayConstMeta => const TaskConstMeta(
+    debugName: "UtttGame_ai_play",
+    argNames: ["that", "availableMove", "crossPlaying"],
+  );
+
+  @override
+  int crateApiGameUtttGameAutoAccessorGetBigGame({required UtttGame that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_u_32,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAutoAccessorGetBigGameConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAutoAccessorGetBigGameConstMeta =>
+      const TaskConstMeta(
+        debugName: "UtttGame_auto_accessor_get_big_game",
+        argNames: ["that"],
+      );
+
+  @override
+  BigInt crateApiGameUtttGameAutoAccessorGetCrosses({required UtttGame that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 3)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_U128,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAutoAccessorGetCrossesConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAutoAccessorGetCrossesConstMeta =>
+      const TaskConstMeta(
+        debugName: "UtttGame_auto_accessor_get_crosses",
+        argNames: ["that"],
+      );
+
+  @override
+  BigInt crateApiGameUtttGameAutoAccessorGetNoughts({required UtttGame that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_U128,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAutoAccessorGetNoughtsConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAutoAccessorGetNoughtsConstMeta =>
+      const TaskConstMeta(
+        debugName: "UtttGame_auto_accessor_get_noughts",
+        argNames: ["that"],
+      );
+
+  @override
+  GameState crateApiGameUtttGameAutoAccessorGetState({required UtttGame that}) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_game_state,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAutoAccessorGetStateConstMeta,
+        argValues: [that],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAutoAccessorGetStateConstMeta =>
+      const TaskConstMeta(
+        debugName: "UtttGame_auto_accessor_get_state",
+        argNames: ["that"],
+      );
+
+  @override
+  void crateApiGameUtttGameAutoAccessorSetBigGame({
+    required UtttGame that,
+    required int bigGame,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          sse_encode_u_32(bigGame, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAutoAccessorSetBigGameConstMeta,
+        argValues: [that, bigGame],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAutoAccessorSetBigGameConstMeta =>
+      const TaskConstMeta(
+        debugName: "UtttGame_auto_accessor_set_big_game",
+        argNames: ["that", "bigGame"],
+      );
+
+  @override
+  void crateApiGameUtttGameAutoAccessorSetCrosses({
+    required UtttGame that,
+    required BigInt crosses,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          sse_encode_U128(crosses, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAutoAccessorSetCrossesConstMeta,
+        argValues: [that, crosses],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAutoAccessorSetCrossesConstMeta =>
+      const TaskConstMeta(
+        debugName: "UtttGame_auto_accessor_set_crosses",
+        argNames: ["that", "crosses"],
+      );
+
+  @override
+  void crateApiGameUtttGameAutoAccessorSetNoughts({
+    required UtttGame that,
+    required BigInt noughts,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          sse_encode_U128(noughts, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAutoAccessorSetNoughtsConstMeta,
+        argValues: [that, noughts],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAutoAccessorSetNoughtsConstMeta =>
+      const TaskConstMeta(
+        debugName: "UtttGame_auto_accessor_set_noughts",
+        argNames: ["that", "noughts"],
+      );
+
+  @override
+  void crateApiGameUtttGameAutoAccessorSetState({
+    required UtttGame that,
+    required GameState state,
+  }) {
+    return handler.executeSync(
+      SyncTask(
+        callFfi: () {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          sse_encode_game_state(state, serializer);
+          return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameAutoAccessorSetStateConstMeta,
+        argValues: [that, state],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameAutoAccessorSetStateConstMeta =>
+      const TaskConstMeta(
+        debugName: "UtttGame_auto_accessor_set_state",
+        argNames: ["that", "state"],
+      );
+
+  @override
+  Future<UtttGame> crateApiGameUtttGameNew() {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 10,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData:
+              sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame,
           decodeErrorData: null,
         ),
         constMeta: kCrateApiGameUtttGameNewConstMeta,
@@ -123,7 +451,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiGameUtttGameNewConstMeta =>
-      const TaskConstMeta(debugName: "uttt_game_new", argNames: []);
+      const TaskConstMeta(debugName: "UtttGame_new", argNames: []);
 
   @override
   Future<List<GridPosition>> crateApiGameUtttGamePlay({
@@ -144,7 +472,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           pdeCallFfi(
             generalizedFrbRustBinding,
             serializer,
-            funcId: 2,
+            funcId: 11,
             port: port_,
           );
         },
@@ -160,8 +488,47 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiGameUtttGamePlayConstMeta => const TaskConstMeta(
-    debugName: "uttt_game_play",
+    debugName: "UtttGame_play",
     argNames: ["that", "cell", "crossPlaying"],
+  );
+
+  @override
+  Future<void> crateApiGameUtttGameUndo({
+    required UtttGame that,
+    required GridPosition cell,
+    required bool crossMove,
+  }) {
+    return handler.executeNormal(
+      NormalTask(
+        callFfi: (port_) {
+          final serializer = SseSerializer(generalizedFrbRustBinding);
+          sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+            that,
+            serializer,
+          );
+          sse_encode_box_autoadd_grid_position(cell, serializer);
+          sse_encode_bool(crossMove, serializer);
+          pdeCallFfi(
+            generalizedFrbRustBinding,
+            serializer,
+            funcId: 12,
+            port: port_,
+          );
+        },
+        codec: SseCodec(
+          decodeSuccessData: sse_decode_unit,
+          decodeErrorData: null,
+        ),
+        constMeta: kCrateApiGameUtttGameUndoConstMeta,
+        argValues: [that, cell, crossMove],
+        apiImpl: this,
+      ),
+    );
+  }
+
+  TaskConstMeta get kCrateApiGameUtttGameUndoConstMeta => const TaskConstMeta(
+    debugName: "UtttGame_undo",
+    argNames: ["that", "cell", "crossMove"],
   );
 
   RustArcIncrementStrongCountFnType
@@ -174,7 +541,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   UtttGame
+  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return UtttGameImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  UtttGame
   dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    dynamic raw,
+  ) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return UtttGameImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  UtttGame
+  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
     dynamic raw,
   ) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -281,22 +666,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  UTTTGame dco_decode_uttt_game(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
-    return UTTTGame(
-      crosses: dco_decode_U128(arr[0]),
-      noughts: dco_decode_U128(arr[1]),
-      bigGame: dco_decode_u_32(arr[2]),
-      state: dco_decode_game_state(arr[3]),
+  UtttGame
+  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return UtttGameImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
     );
   }
 
   @protected
   UtttGame
   sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    SseDeserializer deserializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return UtttGameImpl.frbInternalSseDecode(
+      sse_decode_usize(deserializer),
+      sse_decode_i_32(deserializer),
+    );
+  }
+
+  @protected
+  UtttGame
+  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
     SseDeserializer deserializer,
   ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -418,23 +813,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  UTTTGame sse_decode_uttt_game(SseDeserializer deserializer) {
+  void
+  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    UtttGame self,
+    SseSerializer serializer,
+  ) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_crosses = sse_decode_U128(deserializer);
-    var var_noughts = sse_decode_U128(deserializer);
-    var var_bigGame = sse_decode_u_32(deserializer);
-    var var_state = sse_decode_game_state(deserializer);
-    return UTTTGame(
-      crosses: var_crosses,
-      noughts: var_noughts,
-      bigGame: var_bigGame,
-      state: var_state,
+    sse_encode_usize(
+      (self as UtttGameImpl).frbInternalSseEncode(move: true),
+      serializer,
     );
   }
 
   @protected
   void
   sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
+    UtttGame self,
+    SseSerializer serializer,
+  ) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+      (self as UtttGameImpl).frbInternalSseEncode(move: false),
+      serializer,
+    );
+  }
+
+  @protected
+  void
+  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerUTTTGame(
     UtttGame self,
     SseSerializer serializer,
   ) {
@@ -554,15 +960,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putBigUint64(self);
   }
-
-  @protected
-  void sse_encode_uttt_game(UTTTGame self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_U128(self.crosses, serializer);
-    sse_encode_U128(self.noughts, serializer);
-    sse_encode_u_32(self.bigGame, serializer);
-    sse_encode_game_state(self.state, serializer);
-  }
 }
 
 @sealed
@@ -583,4 +980,53 @@ class UtttGameImpl extends RustOpaque implements UtttGame {
     rustArcDecrementStrongCountPtr:
         RustLib.instance.api.rust_arc_decrement_strong_count_UtttGamePtr,
   );
+
+  Future<GridPosition> aiPlay({
+    required List<GridPosition> availableMove,
+    required bool crossPlaying,
+  }) => RustLib.instance.api.crateApiGameUtttGameAiPlay(
+    that: this,
+    availableMove: availableMove,
+    crossPlaying: crossPlaying,
+  );
+
+  int get bigGame => RustLib.instance.api
+      .crateApiGameUtttGameAutoAccessorGetBigGame(that: this);
+
+  BigInt get crosses => RustLib.instance.api
+      .crateApiGameUtttGameAutoAccessorGetCrosses(that: this);
+
+  BigInt get noughts => RustLib.instance.api
+      .crateApiGameUtttGameAutoAccessorGetNoughts(that: this);
+
+  GameState get state =>
+      RustLib.instance.api.crateApiGameUtttGameAutoAccessorGetState(that: this);
+
+  set bigGame(int bigGame) => RustLib.instance.api
+      .crateApiGameUtttGameAutoAccessorSetBigGame(that: this, bigGame: bigGame);
+
+  set crosses(BigInt crosses) => RustLib.instance.api
+      .crateApiGameUtttGameAutoAccessorSetCrosses(that: this, crosses: crosses);
+
+  set noughts(BigInt noughts) => RustLib.instance.api
+      .crateApiGameUtttGameAutoAccessorSetNoughts(that: this, noughts: noughts);
+
+  set state(GameState state) => RustLib.instance.api
+      .crateApiGameUtttGameAutoAccessorSetState(that: this, state: state);
+
+  Future<List<GridPosition>> play({
+    required GridPosition cell,
+    required bool crossPlaying,
+  }) => RustLib.instance.api.crateApiGameUtttGamePlay(
+    that: this,
+    cell: cell,
+    crossPlaying: crossPlaying,
+  );
+
+  Future<void> undo({required GridPosition cell, required bool crossMove}) =>
+      RustLib.instance.api.crateApiGameUtttGameUndo(
+        that: this,
+        cell: cell,
+        crossMove: crossMove,
+      );
 }
