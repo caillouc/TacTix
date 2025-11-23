@@ -16,9 +16,8 @@ fn print_available(available: Vec<GridPosition>) {
  
 fn main() {
     let mut game = UTTTGame::new();
-    let _ = game.play(GridPosition { grid: 0, pos_in_grid: 6 }, true);
-    let _ = game.play(GridPosition { grid: 0, pos_in_grid: 7 }, true);
-    let _ = game.play(GridPosition { grid: 0, pos_in_grid: 8 }, true);
+    let available_move = game.play(GridPosition { grid: 0, pos_in_grid: 6 }, true);
+    let _ = game.ai_play(available_move, false);
     println!("{}", game.state);
     println!("{}", game);
 }

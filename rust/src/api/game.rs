@@ -54,7 +54,7 @@ impl UTTTGame {
         if self.check_single_win(self.big_game & 511) {
             self.state = GameState::CrosssesWin;
         // Take only the 9 bits for noughts
-        } else if self.check_single_win(self.big_game << 9) {
+        } else if self.check_single_win(self.big_game >> 9) {
             self.state = GameState::NoughtsWin;
         }
     }
@@ -92,15 +92,19 @@ impl UTTTGame {
     }
 
     pub fn ai_play(&self, available_move: Vec<GridPosition>, cross_playing: bool) -> GridPosition {
+        if available_move.len() == 1 {
+            return available_move[0].clone();
+        }
         let mut game_run = 0;
         let mut move_scores: Vec<i32> = vec![0; available_move.len()];
         let mut rng = rand::rng();
-        while game_run < 10 {
+        while game_run < 100000 {
             // Clone the current game
             let mut game = self.clone();
             let initial_move = rng.random_range(0..available_move.len());
             let mut cross_turn = cross_playing;
             let mut moves = game.play(available_move[initial_move].clone(), cross_turn);
+            cross_turn = !cross_turn;
             while !matches!(
                 game.state,
                 GameState::CrosssesWin | GameState::NoughtsWin | GameState::Tie
@@ -110,12 +114,12 @@ impl UTTTGame {
                 moves = game.play(cell, cross_turn);
                 cross_turn = !cross_turn;
             }
-            println!("{}", game);
+            // println!("{}", game);
             // Update scores
             match game.state {
                 GameState::CrosssesWin => {
                     if cross_playing {
-                        move_scores[initial_move] += 3;
+                        move_scores[initial_move] += 5;
                     } else {
                         move_scores[initial_move] -= 1;
                     }
@@ -124,11 +128,11 @@ impl UTTTGame {
                     if cross_playing {
                         move_scores[initial_move] -= 1;
                     } else {
-                        move_scores[initial_move] += 3;
+                        move_scores[initial_move] += 5;
                     }
                 }
                 GameState::Tie => {
-                    move_scores[initial_move] += 1;
+                    move_scores[initial_move] += 0;
                 }
                 _ => {}
             }
@@ -195,7 +199,8 @@ impl UTTTGame {
         let mut next_moves = vec![];
         let mut start_check_index = 0;
         let mut end_check_index = 81;
-        if self.big_game & 1 << cell.pos_in_grid == 0 && self.big_game & (1 << (cell.pos_in_grid + 9)) == 0
+        if self.big_game & 1 << cell.pos_in_grid == 0
+            && self.big_game & (1 << (cell.pos_in_grid + 9)) == 0
             && (self.crosses | self.noughts) & (511 << (cell.pos_in_grid * 9)) != 511
         {
             // The corresponding grid is not won and has empty cell
@@ -205,7 +210,10 @@ impl UTTTGame {
         }
         let available_cell = self.crosses | self.noughts;
         for i in start_check_index..end_check_index {
-            if self.big_game & (1 << (i / 9)) == 0 && available_cell & (1 << i) == 0 {
+            if self.big_game & (1 << (i / 9)) == 0
+                && self.big_game & (1 << ((i / 9) + 9)) == 0
+                && available_cell & (1 << i) == 0
+            {
                 // Cell is available and grid is not yet won
                 next_moves.push(GridPosition {
                     grid: i / 9,
