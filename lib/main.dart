@@ -300,45 +300,44 @@ class _GamePageState extends State<GamePage> {
               ),
             ),
             Expanded(
-              child: Column(
-                children: [
-                  _buildGameStateHeader(),
-                  Expanded(
-                    child: Center(
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: List.generate(3, (row) {
-                              return Expanded(
-                                child: Row(
-                                  children: List.generate(3, (col) {
-                                    final gridIndex = row * 3 + col;
-                                    return Expanded(
-                                      child: Container(
-                                        margin: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onSurface,
-                                            width: 2,
-                                          ),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildGameStateHeader(),
+                    AspectRatio(
+                      aspectRatio: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: List.generate(3, (row) {
+                            return Expanded(
+                              child: Row(
+                                children: List.generate(3, (col) {
+                                  final gridIndex = row * 3 + col;
+                                  return Expanded(
+                                    child: Container(
+                                      margin: const EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                          width: 2,
                                         ),
-                                        child: _buildSubGrid(gridIndex),
                                       ),
-                                    );
-                                  }),
-                                ),
-                              );
-                            }),
-                          ),
+                                      child: _buildSubGrid(gridIndex),
+                                    ),
+                                  );
+                                }),
+                              ),
+                            );
+                          }),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Padding(
@@ -375,7 +374,7 @@ class _GamePageState extends State<GamePage> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.refresh, size: 32),
-                    onPressed: _initGame,
+                    onPressed: isAiPlaying ? null : _initGame,
                     tooltip: 'New Game',
                   ),
                   IconButton(
