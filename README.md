@@ -1,16 +1,14 @@
-# tac_tics
+# TacTix
 
-A new Flutter project.
+An ios app, with clean and simple UI for the Ultimate tic tac toe app.
+The app has two modes : 
 
-## Getting Started
+* Local two player
+* Humain vs AI
 
-This project is a starting point for a Flutter application.
+AI mode is simply a Monte Carlo tree search (MCTS). This project was a good exercice to use the 'Flutter Rust Bridge', since the ai player needs to generate efficiently a bunch of game. Most of the UI made in dart is AI generated, this was not the main puropose of the project.
 
-A few resources to get you started if this is your first Flutter project:
+For any question or request, feel free to open an issue.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
