@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:tac_tics/src/rust/api/game.dart';
 import 'package:tac_tics/src/rust/frb_generated.dart';
@@ -55,6 +56,7 @@ class _GamePageState extends State<GamePage> {
   List<bool> turnHistory = [];
   bool isRobotMode = false;
   bool isAiPlaying = false;
+  bool isAiCross = false;
 
   @override
   void initState() {
@@ -72,7 +74,17 @@ class _GamePageState extends State<GamePage> {
       validMovesHistory = [];
       turnHistory = [];
       isAiPlaying = false;
+      if (isRobotMode) {
+        isAiCross = Random().nextBool();
+      }
     });
+    if (isRobotMode) {
+      final isAiTurn = (isAiCross && gameState == GameState.crossesTurn) ||
+          (!isAiCross && gameState == GameState.noughtsTurn);
+      if (isAiTurn) {
+        _playAi();
+      }
+    }
   }
 
   Future<void> _updateState(UtttGame gameInstance) async {
@@ -100,7 +112,7 @@ class _GamePageState extends State<GamePage> {
       return;
     }
 
-    if (isRobotMode && !isCrossPlaying) return;
+    if (isRobotMode && isCrossPlaying == isAiCross) return;
 
     final tappedPos = GridPosition(grid: gridIndex, posInGrid: cellIndex);
 
@@ -126,8 +138,12 @@ class _GamePageState extends State<GamePage> {
       validMoves = nextMoves;
     });
 
-    if (isRobotMode && gameState == GameState.noughtsTurn) {
-      _playAi();
+    if (isRobotMode) {
+      final isAiTurn = (isAiCross && gameState == GameState.crossesTurn) ||
+          (!isAiCross && gameState == GameState.noughtsTurn);
+      if (isAiTurn) {
+        _playAi();
+      }
     }
   }
 
@@ -137,21 +153,33 @@ class _GamePageState extends State<GamePage> {
       isAiPlaying = true;
     });
 
-    // Small delay for UX
-    // await Future.delayed(const Duration(milliseconds: 500));
-
     try {
       // Calculate available moves if validMoves is null
-      List<GridPosition> availableMoves = List.from(validMoves ?? []);
+      List<GridPosition> availableMoves;
+      if (validMoves == null) {
+        availableMoves = List.generate(
+          9,
+          (g) => List.generate(
+            9,
+            (p) => GridPosition(grid: g, posInGrid: p),
+          ),
+        ).expand((i) => i).toList();
+      } else {
+        availableMoves = List.from(validMoves!);
+      }
 
-      // Call AI play
-      final playedPos = await game!.aiPlay(
+      // Ensure at least 1 second delay for UX
+      final minDelay = Future.delayed(const Duration(seconds: 1));
+      final aiFuture = game!.aiPlay(
         availableMove: availableMoves,
-        crossPlaying: false, // AI is Noughts
+        crossPlaying: isAiCross,
       );
 
+      final results = await Future.wait([aiFuture, minDelay]);
+      final playedPos = results[0] as GridPosition;
+
       // Execute the move
-      await _executeMove(playedPos, false);
+      await _executeMove(playedPos, isAiCross);
     } finally {
       if (mounted) {
         setState(() {
@@ -164,24 +192,53 @@ class _GamePageState extends State<GamePage> {
   Future<void> _undoLastMove() async {
     if (game == null || moveHistory.isEmpty || isAiPlaying) return;
 
-    final lastMove = moveHistory.removeLast();
-    final lastValidMoves = validMovesHistory.removeLast();
-    final wasCross = turnHistory.removeLast();
+    // Function to undo a single move
+    Future<void> undoSingleMove() async {
+      if (moveHistory.isEmpty) return;
+      final lastMove = moveHistory.removeLast();
+      final lastValidMoves = validMovesHistory.removeLast();
+      final wasCross = turnHistory.removeLast();
 
-    await game!.undo(cell: lastMove, crossMove: wasCross);
+      await game!.undo(cell: lastMove, crossMove: wasCross);
+      
+      setState(() {
+        validMoves = lastValidMoves;
+      });
+    }
+
+    await undoSingleMove();
+
+    // If in robot mode, undo until it's human's turn
+    if (isRobotMode) {
+      while (moveHistory.isNotEmpty) {
+        final isAiTurn = (isAiCross && game!.state == GameState.crossesTurn) ||
+            (!isAiCross && game!.state == GameState.noughtsTurn);
+        
+        if (isAiTurn) {
+          await undoSingleMove();
+        } else {
+          break;
+        }
+      }
+    }
 
     await _updateState(game!);
-    setState(() {
-      validMoves = lastValidMoves;
-    });
   }
 
   void _toggleRobotMode() {
     setState(() {
       isRobotMode = !isRobotMode;
+      if (isRobotMode) {
+        isAiCross = Random().nextBool();
+      }
     });
-    if (isRobotMode && gameState == GameState.noughtsTurn) {
-      _playAi();
+    
+    if (isRobotMode) {
+      final isAiTurn = (isAiCross && gameState == GameState.crossesTurn) ||
+          (!isAiCross && gameState == GameState.noughtsTurn);
+      if (isAiTurn) {
+        _playAi();
+      }
     }
   }
 
@@ -243,44 +300,45 @@ class _GamePageState extends State<GamePage> {
               ),
             ),
             Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildGameStateHeader(),
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: List.generate(3, (row) {
-                            return Expanded(
-                              child: Row(
-                                children: List.generate(3, (col) {
-                                  final gridIndex = row * 3 + col;
-                                  return Expanded(
-                                    child: Container(
-                                      margin: const EdgeInsets.all(2),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface,
-                                          width: 2,
+              child: Column(
+                children: [
+                  _buildGameStateHeader(),
+                  Expanded(
+                    child: Center(
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: List.generate(3, (row) {
+                              return Expanded(
+                                child: Row(
+                                  children: List.generate(3, (col) {
+                                    final gridIndex = row * 3 + col;
+                                    return Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                            width: 2,
+                                          ),
                                         ),
+                                        child: _buildSubGrid(gridIndex),
                                       ),
-                                      child: _buildSubGrid(gridIndex),
-                                    ),
-                                  );
-                                }),
-                              ),
-                            );
-                          }),
+                                    );
+                                  }),
+                                ),
+                              );
+                            }),
+                          ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             Padding(
@@ -322,7 +380,7 @@ class _GamePageState extends State<GamePage> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.undo, size: 32),
-                    onPressed: moveHistory.isEmpty ? null : _undoLastMove,
+                    onPressed: (moveHistory.isEmpty || isAiPlaying) ? null : _undoLastMove,
                     tooltip: 'Undo',
                   ),
                 ],
@@ -341,10 +399,12 @@ class _GamePageState extends State<GamePage> {
 
     if (gameState == GameState.crossesTurn) {
       text = "Crosses Turn";
+      if (isRobotMode && isAiCross) text += " (AI Turn)";
       icon = Icons.close_rounded;
       color = Colors.red;
     } else if (gameState == GameState.noughtsTurn) {
       text = "Noughts Turn";
+      if (isRobotMode && !isAiCross) text += " (AI Turn)";
       icon = Icons.circle_outlined;
       color = Colors.blue;
     } else if (gameState == GameState.crosssesWin) {

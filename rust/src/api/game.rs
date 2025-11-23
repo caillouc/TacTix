@@ -2,6 +2,10 @@ use flutter_rust_bridge::frb;
 use rand::Rng;
 use std::fmt::{self};
 
+const WIN_MULTIPLYER: i32 = 1;
+const TIE_REWARD: i32 = 0;
+const LOSS_MULTIPLYER: i32 = 3;
+
 #[frb(opaque)]
 #[derive(Clone)]
 pub struct UTTTGame {
@@ -37,6 +41,19 @@ pub struct GridPosition {
     // The origin is top left
     pub grid: u16,
     pub pos_in_grid: u16,
+}
+
+fn u128_to_binary_string(value: u128) -> String {
+    let mut s = String::new();
+    // Add space every 9 bits for better readability
+    for i in (0..128).rev() {
+        if i % 9 == 8 && i != 127 {
+            s.push(' ');
+        }
+        let bit = (value >> i) & 1;
+        s.push_str(&bit.to_string());
+    }
+    s
 }
 
 impl UTTTGame {
@@ -98,12 +115,13 @@ impl UTTTGame {
         let mut game_run = 0;
         let mut move_scores: Vec<i32> = vec![0; available_move.len()];
         let mut rng = rand::rng();
-        while game_run < 100000 {
+        while game_run < 20000 {
             // Clone the current game
             let mut game = self.clone();
             let initial_move = rng.random_range(0..available_move.len());
             let mut cross_turn = cross_playing;
             let mut moves = game.play(available_move[initial_move].clone(), cross_turn);
+            let mut number_of_moves = 1;
             cross_turn = !cross_turn;
             while !matches!(
                 game.state,
@@ -112,6 +130,10 @@ impl UTTTGame {
                 let choice = rng.random_range(0..moves.len());
                 let cell = moves[choice].clone();
                 moves = game.play(cell, cross_turn);
+                if cross_turn == cross_playing {
+                    // Only count the moves of the AI
+                    number_of_moves += 1;
+                }
                 cross_turn = !cross_turn;
             }
             // println!("{}", game);
@@ -119,20 +141,20 @@ impl UTTTGame {
             match game.state {
                 GameState::CrosssesWin => {
                     if cross_playing {
-                        move_scores[initial_move] += 5;
+                        move_scores[initial_move] += (100 / number_of_moves) * WIN_MULTIPLYER;
                     } else {
-                        move_scores[initial_move] -= 1;
+                        move_scores[initial_move] -= (100 / number_of_moves) * LOSS_MULTIPLYER;
                     }
                 }
                 GameState::NoughtsWin => {
                     if cross_playing {
-                        move_scores[initial_move] -= 1;
+                        move_scores[initial_move] -= (100 / number_of_moves) * LOSS_MULTIPLYER;
                     } else {
-                        move_scores[initial_move] += 5;
+                        move_scores[initial_move] += (100 / number_of_moves) * WIN_MULTIPLYER;
                     }
                 }
                 GameState::Tie => {
-                    move_scores[initial_move] += 0;
+                    move_scores[initial_move] += TIE_REWARD;
                 }
                 _ => {}
             }
@@ -201,7 +223,7 @@ impl UTTTGame {
         let mut end_check_index = 81;
         if self.big_game & 1 << cell.pos_in_grid == 0
             && self.big_game & (1 << (cell.pos_in_grid + 9)) == 0
-            && (self.crosses | self.noughts) & (511 << (cell.pos_in_grid * 9)) != 511
+            && (self.crosses | self.noughts) & (511 << (cell.pos_in_grid * 9)) != 511 << (cell.pos_in_grid * 9)
         {
             // The corresponding grid is not won and has empty cell
             // This should be the most common scenario
